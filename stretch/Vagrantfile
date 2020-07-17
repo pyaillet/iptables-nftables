@@ -1,0 +1,31 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/stretch64"
+  config.vm.box_check_update = false
+  config.vbguest.auto_update = false
+#  config.vm.network "public_network", :adapter=>1 , type: "dhcp"
+
+  config.vm.provider "virtualbox" do |vb|
+    # Display the VirtualBox GUI when booting the machine
+    vb.gui = false
+ 
+    # Customize the amount of memory on the VM:
+    vb.memory = "1024"
+  end
+  
+  config.vm.define "server" do |web|
+    web.vm.provision "shell", path: "../cloud-init-web.sh"
+    web.vm.network "private_network", :adapter=>2, name: "vboxnet1", ip: "192.168.50.10"
+  end
+
+  config.vm.define "client" do |client|
+    client.vm.provision "shell", path: "../cloud-init-client.sh"
+    client.vm.network "private_network", :adapter=>2, name: "vboxnet1", ip: "192.168.50.11"
+  end
+end
